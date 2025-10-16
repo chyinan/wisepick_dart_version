@@ -1,0 +1,110 @@
+openapi: 3.0.0
+info:
+  title: JD OAuth Integration API Contract (draft)
+  version: 0.1.0
+  description: OpenAPI 草案，用于后端与京东 OAuth 授权交互。基于京东官方文档 https://jos.jd.com/commondoc?listId=32
+servers:
+  - url: https://{host}
+    variables:
+      host:
+        default: api.example.com
+paths:
+  /oauth/jd/authorize:
+    get:
+      summary: 发起京东授权跳转
+      parameters:
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: scope
+          schema:
+            type: string
+          required: false
+      responses:
+        '302':
+          description: 将客户端重定向到京东授权页面（Location header）
+  /oauth/jd/callback:
+    get:
+      summary: 京东授权回调（授权码模式）
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: state
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: 回调处理成功（可以包含前端跳转或 JSON 响应）
+  /oauth/jd/token:
+    post:
+      summary: 服务器端使用授权码换取 token 或使用 client_credentials 获取 token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                grant_type:
+                  type: string
+                  enum: [authorization_code, client_credentials]
+                code:
+                  type: string
+                redirect_uri:
+                  type: string
+                client_id:
+                  type: string
+                client_secret:
+                  type: string
+      responses:
+        '200':
+          description: 返回 token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                  expires_in:
+                    type: integer
+  /oauth/jd/refresh:
+    post:
+      summary: 使用 refresh_token 刷新 access_token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: 返回新的 token
+  /oauth/jd/revoke:
+    post:
+      summary: 撤销 token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: 撤销成功
