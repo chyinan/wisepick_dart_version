@@ -98,37 +98,7 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            Text('OpenAI API Key', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            TextField(controller: _openAiController, decoration: InputDecoration(hintText: 'sk-...')),
-            const SizedBox(height: 16),
-            Text('API Base URL (可选，留空使用默认)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            TextField(controller: _baseUrlController, decoration: InputDecoration(hintText: 'https://api.openai.com/v1')),
-            const SizedBox(height: 16),
-            Text('Model (例如 gpt-3.5-turbo 或 gpt-4)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            if (_loadingModels)
-              Row(children: [const CircularProgressIndicator(), const SizedBox(width: 12), const Text('正在加载可用模型...')])
-            else if (_modelError != null)
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('获取模型列表失败: $_modelError', style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                const SizedBox(height: 8),
-                TextField(controller: _modelController, decoration: InputDecoration(hintText: '手动输入模型，例如 gpt-3.5-turbo'))
-              ])
-            else
-              DropdownButtonFormField<String>(
-                value: _models.contains(_modelController.text) ? _modelController.text : null,
-                items: _models.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
-                onChanged: (v) {
-                  if (v == null) return;
-                  setState(() {
-                    _modelController.text = v;
-                  });
-                },
-                decoration: const InputDecoration(),
-                hint: Text(_modelController.text.isNotEmpty ? _modelController.text : '选择模型或稍等自动加载'),
-              ),
+            // OpenAI related settings moved to 用户设置页面
             const SizedBox(height: 16),
             Text('带货联盟 API Key / Tracking', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
@@ -249,6 +219,7 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
                     onPressed: () async {
                       try {
                         final box = await Hive.openBox('settings');
+                        // OpenAI settings moved to 用户设置页面; 保持后端兼容性但不在此界面展示
                         await box.put('openai_api', _openAiController.text.trim());
                         await box.put('openai_base', _baseUrlController.text.trim());
                         await box.put('openai_model', _modelController.text.trim());

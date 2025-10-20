@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 // 使用本地或打包字体 Noto Sans SC（在 pubspec.yaml 中声明）
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,8 +17,11 @@ final seedColorProvider = StateProvider<Color>((ref) => const Color(0xFFFF7043))
 Future<void> main() async {
   // 初始化 Flutter 绑定
   WidgetsFlutterBinding.ensureInitialized();
-  // 初始化 window_manager（桌面端）
-  await windowManager.ensureInitialized();
+
+  // 仅在桌面平台初始化 window_manager，避免在 Android/iOS 上阻塞或抛错
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    await windowManager.ensureInitialized();
+  }
 
   // 初始化 Hive，用于本地存储（收藏、历史）
   await Hive.initFlutter();
@@ -26,8 +31,11 @@ Future<void> main() async {
 
   // 使用 Riverpod 的 ProviderScope 包裹整个应用
   runApp(const ProviderScope(child: WisePickApp()));
-  // 设置桌面窗口标题
-  await windowManager.setTitle('快淘帮');
+
+  // 仅在桌面平台设置窗口标题
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    await windowManager.setTitle('快淘帮');
+  }
 }
 
 /// 应用根组件：快淘帮（WisePick）MVP

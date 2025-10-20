@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/chat/chat_providers.dart';
 import '../features/chat/conversation_model.dart';
+import 'user_settings_page.dart';
 // import '../features/chat/chat_service.dart';
 
 /// 侧边菜单：展示会话列表并支持新建会话
@@ -175,6 +176,15 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   );
                 },
               ),
+            ),
+            const Divider(),
+            ListTile(
+              leading: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary),
+              title: const Text('设置'),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const UserSettingsPage()));
+              },
             ),
             if (_isMultiSelect)
               Padding(
